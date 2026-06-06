@@ -1,0 +1,30 @@
+{
+  "project_type": "Django REST backend + React Native mobile frontend (greenfield)",
+  "language": "Python (backend), JavaScript/React Native (frontend)",
+  "build_system": "Django manage.py (backend), React Native CLI / Expo (frontend)",
+  "test_framework": "Django test framework (backend), Jest (frontend)",
+  "build_command": "N/A - INTEGRATIONS_ONLY network, cannot install dependencies. Source files only.",
+  "test_command": "N/A - INTEGRATIONS_ONLY network, cannot run tests without installed dependencies.",
+  "verification_instructions": "Verify file structure is correct and code is syntactically valid using python -c 'import ast; ast.parse(open(file).read())' for Python and node --check for JS files.",
+  "snapshot_or_generated_files": null,
+  "setup_instructions": "N/A - greenfield project, source files to be created from scratch.",
+  "environment_constraints": "INTEGRATIONS_ONLY network mode. Cannot install packages (npm, pip). Cannot run Django server or React Native bundler. Can only create source files and validate syntax. Python 3.11 and Node.js v22 available for syntax checking.",
+  "contribution_requirements": "N/A - new repository, no existing contribution guidelines.",
+  "key_patterns": "Django REST Framework for API, React Native with react-native-maps for frontend map display. Backend provides listings with geolocation data. Frontend renders markers on map and shows quick preview modal on tap.",
+  "relevant_files": [
+    "backend/",
+    "backend/manage.py",
+    "backend/ejoutia/settings.py",
+    "backend/listings/models.py",
+    "backend/listings/serializers.py",
+    "backend/listings/views.py",
+    "backend/listings/urls.py",
+    "frontend/",
+    "frontend/package.json",
+    "frontend/App.js",
+    "frontend/screens/MapScreen.js",
+    "frontend/components/ListingMarker.js",
+    "frontend/components/QuickPreviewModal.js"
+  ],
+  "directory_structure": "backend/ - Django project with listings app providing REST API for listings with location data, photos, price, distance. frontend/ - React Native app with map screen, listing markers, and quick preview modal."
+}

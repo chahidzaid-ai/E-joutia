@@ -1,0 +1,35 @@
+{
+  "id": "FEAT-002",
+  "type": "feat",
+  "description": "Create React Native frontend with map integration, listing markers, and quick preview modal. This implements the full user-facing map UI: react-native-maps integration, auto-centering on user location, blue dot for user position, custom listing markers with icons and colors, marker tap handling to open a bottom sheet/modal with listing details (photo, title, price, distance), and map design/styling.",
+  "status": "in_progress",
+  "steps": [
+    "Create frontend/package.json with dependencies: react, react-native, react-native-maps, react-native-gesture-handler, react-native-reanimated (for bottom sheet animations), @gorhom/bottom-sheet",
+    "Create frontend/app.json with React Native app configuration for 'E-Joutia'",
+    "Create frontend/babel.config.js with standard React Native babel preset and reanimated plugin",
+    "Create frontend/index.js as the app entry point registering the App component",
+    "Create frontend/App.js as root component that renders MapScreen, manages state for userLocation and filteredListings, and requests location permission on mount",
+    "Create frontend/screens/MapScreen.js implementing: (1) MapView from react-native-maps centered on userLocation prop, (2) showsUserLocation={true} for blue dot, (3) receives filteredListings prop and renders ListingMarker for each, (4) state for selectedListing, (5) onMarkerPress handler that sets selectedListing and opens QuickPreviewModal, (6) map region animation when userLocation changes",
+    "Create frontend/components/ListingMarker.js implementing: (1) custom Marker component with styled pin/icon based on listing category, (2) sized markers with colors (e.g., blue for electronics, green for vehicles, orange for furniture), (3) callout disabled (we use modal instead), (4) onPress prop for tap handling, (5) simple scale animation on appear",
+    "Create frontend/components/QuickPreviewModal.js implementing: (1) Bottom sheet or modal that slides up from bottom, (2) displays listing photo at top, (3) title (e.g., 'Velo VTT'), (4) price with currency (e.g., '1200 DH'), (5) distance text (e.g., 'A 1.2 km de vous'), (6) 'Voir plus' button, (7) close/dismiss functionality, (8) clean card-style design",
+    "Create frontend/utils/location.js with helper functions: requestLocationPermission(), getCurrentPosition(), calculateDistance(lat1, lon1, lat2, lon2) using Haversine formula",
+    "Create frontend/constants/colors.js and frontend/constants/categories.js with color palette and category-to-icon/color mappings",
+    "Create frontend/README.md with setup and run instructions"
+  ],
+  "acceptance_criteria": [
+    "frontend/screens/MapScreen.js exists and renders MapView centered on userLocation with showsUserLocation=true",
+    "frontend/components/ListingMarker.js exists and renders custom markers with category-based colors/icons",
+    "frontend/components/QuickPreviewModal.js exists and displays photo, title, price, distance, and 'Voir plus' button",
+    "MapScreen passes filteredListings to ListingMarker components",
+    "Marker press opens QuickPreviewModal with selected listing data",
+    "Map auto-centers on userLocation prop",
+    "All JS files pass syntax validation with node --check"
+  ],
+  "verification": [
+    "Run: find /projects/sandbox/E-joutia/frontend -name '*.js' -exec node --check {} \\;",
+    "Confirm all expected files exist: App.js, screens/MapScreen.js, components/ListingMarker.js, components/QuickPreviewModal.js",
+    "Verify package.json includes react-native-maps dependency"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

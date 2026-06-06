@@ -1,0 +1,7 @@
+{
+  "task_id": "task-map-ui-integration",
+  "task_description": "Create a full-stack application with Django backend providing listings API (with location, photos, price, distance calculation) and React Native frontend with react-native-maps integration showing listings as markers on a map, user location with blue dot, and a quick preview bottom sheet modal when markers are tapped.",
+  "status": "in_progress",
+  "feature_order": ["FEAT-001", "FEAT-002"],
+  "blocked_reason": null
+}
