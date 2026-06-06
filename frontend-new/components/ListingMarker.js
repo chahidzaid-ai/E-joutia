@@ -4,17 +4,18 @@ import { Marker } from 'react-native-maps';
 import categories from '../constants/categories';
 import colors from '../constants/colors';
 
-export default function ListingMarker({ listing, onPress }) {
+export default function ListingMarker({ listing, onPress, isSelected = false }) {
   const scaleAnim = useRef(new Animated.Value(0)).current;
 
+  // Appear animation + grow when selected
   useEffect(() => {
     Animated.spring(scaleAnim, {
-      toValue: 1,
+      toValue: isSelected ? 1.3 : 1,
       friction: 5,
       tension: 80,
       useNativeDriver: true,
     }).start();
-  }, [scaleAnim]);
+  }, [scaleAnim, isSelected]);
 
   const category = categories[listing.category] || categories.other;
   const markerColor = category.color || colors.markers.other;
@@ -34,12 +35,18 @@ export default function ListingMarker({ listing, onPress }) {
           styles.markerContainer,
           {
             backgroundColor: markerColor,
+            borderColor: isSelected ? colors.secondary : colors.white,
             transform: [{ scale: scaleAnim }],
           },
         ]}
       >
         <Text style={styles.emoji}>{emoji}</Text>
-        <View style={styles.arrow} />
+        <View
+          style={[
+            styles.arrow,
+            { borderTopColor: isSelected ? colors.secondary : colors.white },
+          ]}
+        />
       </Animated.View>
     </Marker>
   );

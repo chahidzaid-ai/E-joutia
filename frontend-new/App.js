@@ -11,6 +11,7 @@ const API_BASE_URL = 'http://192.168.100.52:8000/api';
 export default function App() {
   const [userLocation, setUserLocation] = useState(null);
   const [filteredListings, setFilteredListings] = useState([]);
+  const [radius] = useState(5); // km — Membre 1 will provide this later
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -39,22 +40,21 @@ export default function App() {
   }
 
   async function fetchListings(lat, lon) {
-  try {
-    const url = `${API_BASE_URL}/listings/?user_lat=${lat}&user_lon=${lon}`;
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error('Erreur reseau');
+    try {
+      const url = `${API_BASE_URL}/listings/?user_lat=${lat}&user_lon=${lon}`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Erreur reseau');
+      }
+      const data = await response.json();
+      // Handle both plain array and paginated { results: [...] } responses
+      const listings = Array.isArray(data) ? data : (data.results || []);
+      setFilteredListings(listings);
+    } catch (err) {
+      console.error('Fetch listings error:', err);
+      setError('Impossible de charger les annonces');
     }
-    const data = await response.json();
-    // Handle both plain array and paginated { results: [...] } responses
-    const listings = Array.isArray(data) ? data : (data.results || []);
-    setFilteredListings(listings);
-  } catch (err) {
-    console.error('Fetch listings error:', err);
-    setError('Impossible de charger les annonces');
   }
-}
-
 
   if (loading) {
     return (
@@ -75,7 +75,11 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <MapScreen userLocation={userLocation} filteredListings={filteredListings} />
+      <MapScreen
+        userLocation={userLocation}
+        filteredListings={filteredListings}
+        radius={radius}
+      />
     </View>
   );
 }

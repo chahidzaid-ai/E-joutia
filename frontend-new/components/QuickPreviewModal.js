@@ -12,6 +12,13 @@ import colors from '../constants/colors';
 
 const MODAL_HEIGHT = 320;
 
+function formatDistance(value) {
+  const dist = Number(value);
+  if (!Number.isFinite(dist)) return '';
+  if (dist < 1) return `À ${Math.round(dist * 1000)} m de vous`;
+  return `À ${dist.toFixed(1)} km de vous`;
+}
+
 export default function QuickPreviewModal({ listing, visible, onClose, onViewMore }) {
   const translateY = useRef(new Animated.Value(MODAL_HEIGHT)).current;
 
@@ -58,8 +65,7 @@ export default function QuickPreviewModal({ listing, visible, onClose, onViewMor
     return null;
   }
 
-  const distanceText =
-    listing.distance != null ? `A ${listing.distance.toFixed(1)} km de vous` : '';
+  const distanceText = formatDistance(listing.distance);
 
   return (
     <Animated.View
