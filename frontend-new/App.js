@@ -4,7 +4,9 @@ import MapScreen from './screens/MapScreen';
 import { requestLocationPermission, getCurrentPosition } from './utils/location';
 import colors from './constants/colors';
 
-const API_BASE_URL = 'http://localhost:8000/api';
+// IMPORTANT: on a physical phone replace "localhost" with your PC's IP,
+// e.g. 'http://192.168.100.52:8000/api'
+const API_BASE_URL = 'http://192.168.100.52:8000/api';
 
 export default function App() {
   const [userLocation, setUserLocation] = useState(null);
@@ -30,26 +32,29 @@ export default function App() {
       await fetchListings(position.latitude, position.longitude);
     } catch (err) {
       console.error('Initialization error:', err);
-      setError('Erreur lors de l\'initialisation');
+      setError("Erreur lors de l'initialisation");
     } finally {
       setLoading(false);
     }
   }
 
   async function fetchListings(lat, lon) {
-    try {
-      const url = `${API_BASE_URL}/listings/?user_lat=${lat}&user_lon=${lon}`;
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error('Erreur reseau');
-      }
-      const data = await response.json();
-      setFilteredListings(data);
-    } catch (err) {
-      console.error('Fetch listings error:', err);
-      setError('Impossible de charger les annonces');
+  try {
+    const url = `${API_BASE_URL}/listings/?user_lat=${lat}&user_lon=${lon}`;
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error('Erreur reseau');
     }
+    const data = await response.json();
+    // Handle both plain array and paginated { results: [...] } responses
+    const listings = Array.isArray(data) ? data : (data.results || []);
+    setFilteredListings(listings);
+  } catch (err) {
+    console.error('Fetch listings error:', err);
+    setError('Impossible de charger les annonces');
   }
+}
+
 
   if (loading) {
     return (
@@ -70,29 +75,20 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <MapScreen
-        userLocation={userLocation}
-        filteredListings={filteredListings}
-      />
+      <MapScreen userLocation={userLocation} filteredListings={filteredListings} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  container: { flex: 1 },
   centered: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: colors.background,
   },
-  loadingText: {
-    marginTop: 12,
-    fontSize: 16,
-    color: colors.textSecondary,
-  },
+  loadingText: { marginTop: 12, fontSize: 16, color: colors.textSecondary },
   errorText: {
     fontSize: 16,
     color: '#F44336',

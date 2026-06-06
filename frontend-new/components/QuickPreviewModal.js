@@ -6,12 +6,10 @@ import {
   Image,
   TouchableOpacity,
   Animated,
-  Dimensions,
   PanResponder,
 } from 'react-native';
 import colors from '../constants/colors';
 
-const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const MODAL_HEIGHT = 320;
 
 export default function QuickPreviewModal({ listing, visible, onClose, onViewMore }) {
@@ -20,9 +18,7 @@ export default function QuickPreviewModal({ listing, visible, onClose, onViewMor
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: (_, gestureState) => {
-        return gestureState.dy > 5;
-      },
+      onMoveShouldSetPanResponder: (_, gestureState) => gestureState.dy > 5,
       onPanResponderMove: (_, gestureState) => {
         if (gestureState.dy > 0) {
           translateY.setValue(gestureState.dy);
@@ -62,18 +58,12 @@ export default function QuickPreviewModal({ listing, visible, onClose, onViewMor
     return null;
   }
 
-  const distanceText = listing.distance != null
-    ? `A ${listing.distance.toFixed(1)} km de vous`
-    : '';
+  const distanceText =
+    listing.distance != null ? `A ${listing.distance.toFixed(1)} km de vous` : '';
 
   return (
     <Animated.View
-      style={[
-        styles.container,
-        {
-          transform: [{ translateY }],
-        },
-      ]}
+      style={[styles.container, { transform: [{ translateY }] }]}
       {...panResponder.panHandlers}
     >
       <View style={styles.handle} />
@@ -99,9 +89,7 @@ export default function QuickPreviewModal({ listing, visible, onClose, onViewMor
           {listing.price} {listing.currency || 'DH'}
         </Text>
 
-        {distanceText ? (
-          <Text style={styles.distance}>{distanceText}</Text>
-        ) : null}
+        {distanceText ? <Text style={styles.distance}>{distanceText}</Text> : null}
 
         <TouchableOpacity style={styles.viewMoreButton} onPress={onViewMore}>
           <Text style={styles.viewMoreText}>Voir plus</Text>
@@ -149,17 +137,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     zIndex: 1,
   },
-  closeButtonText: {
-    fontSize: 16,
-    color: colors.text,
-    fontWeight: '600',
-  },
-  photo: {
-    width: '100%',
-    height: 120,
-    borderRadius: 12,
-    marginBottom: 12,
-  },
+  closeButtonText: { fontSize: 16, color: colors.text, fontWeight: '600' },
+  photo: { width: '100%', height: 120, borderRadius: 12, marginBottom: 12 },
   photoPlaceholder: {
     width: '100%',
     height: 120,
@@ -169,39 +148,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 12,
   },
-  photoPlaceholderText: {
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
-  content: {
-    flex: 1,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 6,
-  },
-  price: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: colors.primary,
-    marginBottom: 6,
-  },
-  distance: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginBottom: 12,
-  },
+  photoPlaceholderText: { fontSize: 14, color: colors.textSecondary },
+  content: { flex: 1 },
+  title: { fontSize: 18, fontWeight: '700', color: colors.text, marginBottom: 6 },
+  price: { fontSize: 20, fontWeight: '700', color: colors.primary, marginBottom: 6 },
+  distance: { fontSize: 14, color: colors.textSecondary, marginBottom: 12 },
   viewMoreButton: {
     backgroundColor: colors.primary,
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
   },
-  viewMoreText: {
-    color: colors.white,
-    fontSize: 16,
-    fontWeight: '600',
-  },
+  viewMoreText: { color: colors.white, fontSize: 16, fontWeight: '600' },
 });

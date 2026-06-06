@@ -37,7 +37,6 @@ export default function MapScreen({ userLocation, filteredListings }) {
   }
 
   function handleViewMore() {
-    // Navigate to full listing detail in the future
     console.log('View more:', selectedListing?.title);
   }
 
@@ -84,10 +83,6 @@ export default function MapScreen({ userLocation, filteredListings }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  map: {
-    flex: 1,
-  },
+  container: { flex: 1 },
+  map: { flex: 1 },
 });

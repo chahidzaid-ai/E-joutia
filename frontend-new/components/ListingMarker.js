@@ -60,9 +60,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 5,
   },
-  emoji: {
-    fontSize: 18,
-  },
+  emoji: { fontSize: 18 },
   arrow: {
     position: 'absolute',
     bottom: -6,
