@@ -1,77 +1,67 @@
-from rest_framework import viewsets
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 from .models import Listing
 from .serializers import ListingSerializer
+from .utils import haversine_km
+
+# Default search radius (km) when the client does not provide one.
+DEFAULT_RADIUS_KM = 10.0
 
 
-class ListingViewSet(viewsets.ModelViewSet):
+def _parse_float(value, name):
+    """Parse a query param to float, raising ValueError with a clear message."""
+    if value is None:
+        raise ValueError(f"'{name}' is required.")
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        raise ValueError(f"'{name}' must be a valid number.")
+
+
+@api_view(["GET"])
+def nearby_listings(request):
+    """Return listings within `radius` km of (latitude, longitude).
+
+    Query params:
+        latitude  (float, required)
+        longitude (float, required)
+        radius    (float, optional, defaults to 10 km)
+
+    Each returned listing includes a computed `distance` (km, 1 decimal).
+    Results are sorted nearest-first.
     """
-    ViewSet for listing CRUD operations.
-    Accepts optional query parameters:
-    - user_lat: User's latitude for distance calculation
-    - user_lon: User's longitude for distance calculation
-    - max_distance: Maximum distance in km to filter results
-    - category: Filter listings by category
-    """
-    queryset = Listing.objects.all()
-    serializer_class = ListingSerializer
+    try:
+        latitude = _parse_float(request.query_params.get("latitude"), "latitude")
+        longitude = _parse_float(request.query_params.get("longitude"), "longitude")
+        radius = request.query_params.get("radius")
+        radius = _parse_float(radius, "radius") if radius is not None else DEFAULT_RADIUS_KM
+    except ValueError as exc:
+        return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
 
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        user_lat = self.request.query_params.get('user_lat')
-        user_lon = self.request.query_params.get('user_lon')
+    # Basic range validation for coordinates.
+    if not (-90 <= latitude <= 90) or not (-180 <= longitude <= 180):
+        return Response(
+            {"detail": "Coordinates out of range."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    if radius <= 0:
+        return Response(
+            {"detail": "'radius' must be greater than 0."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
-        if user_lat is not None:
-            try:
-                context['user_lat'] = float(user_lat)
-            except (ValueError, TypeError):
-                context['user_lat'] = None
+    nearby = []
+    for listing in Listing.objects.all():
+        distance = haversine_km(latitude, longitude, listing.latitude, listing.longitude)
+        if distance <= radius:
+            # Attach the computed distance so the serializer can expose it.
+            listing.distance = distance
+            nearby.append(listing)
 
-        if user_lon is not None:
-            try:
-                context['user_lon'] = float(user_lon)
-            except (ValueError, TypeError):
-                context['user_lon'] = None
+    # Sort nearest-first.
+    nearby.sort(key=lambda item: item.distance)
 
-        return context
-
-    def get_queryset(self):
-        queryset = Listing.objects.all()
-
-        # Filter by category
-        category = self.request.query_params.get('category')
-        if category:
-            queryset = queryset.filter(category=category)
-
-        return queryset
-
-    def filter_by_distance(self, listings):
-        """Filter serialized listings by max_distance if provided."""
-        max_distance = self.request.query_params.get('max_distance')
-        if max_distance is None:
-            return listings
-
-        try:
-            max_dist = float(max_distance)
-        except (ValueError, TypeError):
-            return listings
-
-        return [
-            listing for listing in listings
-            if listing.get('distance') is not None and listing['distance'] <= max_dist
-        ]
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        serializer = self.get_serializer(queryset, many=True)
-        filtered_data = self.filter_by_distance(serializer.data)
-
-        # Return paginated response if pagination is configured
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            filtered_data = self.filter_by_distance(serializer.data)
-            return self.get_paginated_response(filtered_data)
-
-        from rest_framework.response import Response
-        return Response(filtered_data)
+    serializer = ListingSerializer(nearby, many=True, context={"request": request})
+    return Response(serializer.data, status=status.HTTP_200_OK)

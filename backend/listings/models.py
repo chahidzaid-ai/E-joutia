@@ -2,33 +2,19 @@ from django.db import models
 
 
 class Listing(models.Model):
-    CATEGORY_CHOICES = [
-        ('electronics', 'Electronics'),
-        ('vehicles', 'Vehicles'),
-        ('furniture', 'Furniture'),
-        ('clothing', 'Clothing'),
-        ('sports', 'Sports'),
-        ('books', 'Books'),
-        ('services', 'Services'),
-        ('other', 'Other'),
-    ]
+    """A marketplace product listing with a geographic location."""
 
-    title = models.CharField(max_length=200)
-    description = models.TextField(blank=True, default='')
+    title = models.CharField(max_length=150)
+    description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    currency = models.CharField(max_length=10, default='DH')
+    # `image` is optional so listings can be seeded without an uploaded file.
+    image = models.ImageField(upload_to="listings/", blank=True, null=True)
     latitude = models.FloatField()
     longitude = models.FloatField()
-    photo = models.URLField(max_length=500, blank=True, default='')
     created_at = models.DateTimeField(auto_now_add=True)
-    category = models.CharField(
-        max_length=50,
-        choices=CATEGORY_CHOICES,
-        default='other',
-    )
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ["-created_at"]
 
     def __str__(self):
-        return f"{self.title} - {self.price} {self.currency}"
+        return f"{self.title} ({self.price})"

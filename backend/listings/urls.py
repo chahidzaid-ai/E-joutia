@@ -1,11 +1,7 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
+from django.urls import path
 
-from .views import ListingViewSet
-
-router = DefaultRouter()
-router.register(r'listings', ListingViewSet, basename='listing')
+from . import views
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path("listings/nearby/", views.nearby_listings, name="nearby-listings"),
 ]
