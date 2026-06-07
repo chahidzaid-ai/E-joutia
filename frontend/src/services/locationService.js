@@ -91,3 +91,28 @@ export async function reverseGeocode(latitude, longitude) {
     return null;
   }
 }
+
+/**
+ * Great-circle distance (Haversine) between two coordinates, in kilometers.
+ *
+ * Single client-side source for distance math: the map module previously
+ * shipped its own copy in `utils/location.js`; that logic now lives here so
+ * there is exactly one implementation on the frontend (the backend keeps its
+ * own authoritative copy in `listings/utils.py`).
+ *
+ * @returns {number} distance in km
+ */
+export function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Earth radius in km
+  const toRad = (deg) => (deg * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) *
+      Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}

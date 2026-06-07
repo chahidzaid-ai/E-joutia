@@ -27,7 +27,7 @@ import {
 } from "../services/locationService";
 import { colors, radius as r, spacing } from "../theme";
 
-export default function LocationSetupScreen({ onViewListings }) {
+export default function LocationSetupScreen({ onViewListings, onChooseOnMap }) {
   const [loading, setLoading] = useState(true);
   const [permission, setPermission] = useState(null); // PermissionStatus
   const [coords, setCoords] = useState(null); // { latitude, longitude }
@@ -79,6 +79,15 @@ export default function LocationSetupScreen({ onViewListings }) {
 
           <TouchableOpacity style={styles.primaryButton} onPress={init}>
             <Text style={styles.primaryButtonText}>Retry</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.secondaryButton}
+            onPress={() =>
+              onChooseOnMap?.({ latitude: null, longitude: null, radius: searchRadius })
+            }
+          >
+            <Text style={styles.secondaryButtonText}>Choose location on map</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -146,6 +155,19 @@ export default function LocationSetupScreen({ onViewListings }) {
           }
         >
           <Text style={styles.primaryButtonText}>View Nearby Listings</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.secondaryButton}
+          onPress={() =>
+            onChooseOnMap?.({
+              latitude: coords.latitude,
+              longitude: coords.longitude,
+              radius: searchRadius,
+            })
+          }
+        >
+          <Text style={styles.secondaryButtonText}>Choose on map</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
