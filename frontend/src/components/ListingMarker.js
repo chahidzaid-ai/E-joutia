@@ -1,11 +1,10 @@
 // ListingMarker — a category-colored map pin for a listing.
 //
-// Ported from the teammate's map module (feat/map-ui-integration) and adapted
-// to our single color system (theme.js) and data shape. It is tolerant of
-// listings that have no `category` field (our current backend does not store
-// one yet): such listings fall back to the neutral "other" marker.
+// Ported from the teammate's map module and adapted to our color system
+// (theme.js) and data shape. Tolerant of listings with no `category`
+// (falls back to the neutral "other" marker).
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Animated, StyleSheet, Text, View } from "react-native";
 import { Marker } from "react-native-maps";
 
@@ -13,16 +12,26 @@ import categories from "../constants/categories";
 import { accent, colors } from "../theme";
 
 export default function ListingMarker({ listing, onPress, isSelected = false }) {
-  const scaleAnim = useRef(new Animated.Value(0)).current;
+  // Start visible (scale 1). Starting at 0 + tracksViewChanges=false made the
+  // native map snapshot an invisible pin and never redraw it.
+  const scaleAnim = useRef(new Animated.Value(1)).current;
 
-  // Appear animation + grow when selected.
+  // Keep redrawing the native marker until the custom view has painted,
+  // then stop tracking for performance.
+  const [tracksViewChanges, setTracksViewChanges] = useState(true);
+
   useEffect(() => {
+    setTracksViewChanges(true);
     Animated.spring(scaleAnim, {
       toValue: isSelected ? 1.3 : 1,
       friction: 5,
       tension: 80,
-      useNativeDriver: true,
+      useNativeDriver: false, // must be false so the native snapshot sees the change
     }).start();
+
+    // Give the view a moment to render/animate, then freeze the snapshot.
+    const timer = setTimeout(() => setTracksViewChanges(false), 600);
+    return () => clearTimeout(timer);
   }, [scaleAnim, isSelected]);
 
   const category = categories[listing.category] || categories.other;
@@ -37,7 +46,8 @@ export default function ListingMarker({ listing, onPress, isSelected = false }) 
       }}
       onPress={onPress}
       calloutEnabled={false}
-      tracksViewChanges={false}
+      tracksViewChanges={tracksViewChanges}
+      anchor={{ x: 0.5, y: 1 }}
     >
       <Animated.View
         style={[

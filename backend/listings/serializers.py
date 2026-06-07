@@ -16,10 +16,11 @@ class ListingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Listing
         fields = [
-            "id",
+             "id",
             "title",
             "description",
             "price",
+            "category",
             "image",
             "latitude",
             "longitude",
