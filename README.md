@@ -1,8 +1,7 @@
 # e-Joutia — Géolocalisation & Cartographie des annonces
 
 e-Joutia est une marketplace mobile qui permet de découvrir les annonces
-**autour de soi**. Cette branche (`geolocalisation-cartographie-annonces`)
-implémente la géolocalisation de l'utilisateur, la recherche d'annonces par
+**autour de soi**. Ce projetimplémente la géolocalisation de l'utilisateur, la recherche d'annonces par
 rayon, le calcul de distance et leur affichage sur une carte interactive.
 
 ## Fonctionnalités
